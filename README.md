@@ -39,13 +39,14 @@
 - Recall High Risk: 0.33
 
 6. Easy Ensemble Classifying.
+![eec](https://user-images.githubusercontent.com/85714314/143681760-83ec83f8-292f-45a1-96e3-f77e84e0a02f.png)
 
-- Accuracy Score:
-- Precision High Risk:
-- Recall High Risk:
+- Accuracy Score: 82%
+- Precision High Risk: 0.03
+- Recall High Risk: 0.76
 
 ## Summary
-- The analysis is looking to find which model is most effective for predicting credit risk. Looking at the recall rate for high risk, the model that scored that highest was ---. In conjuction with also having the highest accuracy rate, this model is the most effective for determining if a loan is high risk or not.
+- The analysis is looking to find which model is most effective for predicting credit risk. Looking at the recall rate for high risk, the model that scored that highest was Easy Ensemble Classifying. In conjuction with also having the highest accuracy rate, this model is the most effective for determining if a loan is high risk or not.
 
 
 
