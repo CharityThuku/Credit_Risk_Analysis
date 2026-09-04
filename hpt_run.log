@@ -1,0 +1,17 @@
+Tuning Balanced Random Forest (n_estimators x max_depth)...
+  Best params: {'max_depth': None, 'n_estimators': 200}
+  Best CV ROC-AUC: 0.8623  (10.4s)
+  Held-out test ROC-AUC with best params: 0.8833
+
+Tuning Easy Ensemble (n_estimators only, see note above)...
+  Best params: {'n_estimators': 150}
+  Best CV ROC-AUC: 0.9427  (138.2s)
+  Held-out test ROC-AUC with best params: 0.9638
+
+Saved hyperparameter_tuning_results.csv
+
+Comparison to un-tuned baseline (from model_comparison.csv):
+                         ROC-AUC
+Model                           
+Balanced Random Forest  0.889409
+Easy Ensemble           0.963465

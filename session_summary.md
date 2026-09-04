@@ -23,8 +23,8 @@ User is new to ML metrics — walkthrough proceeds one concept/file at a time wi
 - Done — Step 8: `CODE_REVIEW_CHECKLIST.md` / `CREDIT_RISK_NEXT_STEPS.md` walkthrough, audited against the real notebooks. Found one more bug (hallucinated API param in the checklist itself, see below). See "Step 8" section below for the full audit and open questions for the user.
 - User chose to pursue: cross-validation, hyperparameter tuning, SHAP explainability (skipped updating the stale docs for now).
 - Done — Step 9: 5-fold cross-validation on all 6 methods. See results below -- a real, non-trivial finding here.
-- In progress — Step 10: hyperparameter tuning (Balanced RF, Easy Ensemble)
-- Not yet started — Step 11: SHAP explainability
+- Done — Step 10: hyperparameter tuning (Balanced RF, Easy Ensemble). See results below -- tuning barely moved the needle, which is itself a useful finding.
+- In progress — Step 11: SHAP explainability
 - Still pending: updating `EXECUTIVE_SUMMARY.md`/`README_IMPROVEMENTS.md`.
 - Not yet done: updating `EXECUTIVE_SUMMARY.md` / `README_IMPROVEMENTS.md`, which still describe the old, buggy numbers — user explicitly deferred this to keep doing the technical walkthrough first
 
@@ -123,6 +123,18 @@ Run via `run_cross_validation.py` (new), CV done strictly on `X_train` (imblearn
 **The core conclusion still holds, though:** Easy Ensemble's ROC-AUC (the threshold-independent metric the recommendation is actually based on) is far more stable -- single-split 0.963 vs. CV mean 0.950 +/- 0.015, well within noise -- and still clearly the best of all 6 methods (next best, Balanced RF, CV means 0.862 +/- 0.035). So "Easy Ensemble is the best model" is robust; "Easy Ensemble achieves 90.6% balanced accuracy" is not -- that number should be corrected to ~86% (with the CV std noted) wherever it's quoted going forward, including the still-stale `EXECUTIVE_SUMMARY.md`.
 
 **Why balanced accuracy is the noisy one here:** the test set only has 87 actual high-risk loans. Balanced accuracy's sensitivity term is estimated from that tiny sample, so it swings a lot between which 87 loans happen to land in the split. ROC-AUC integrates over all thresholds using all 17,205 predicted probabilities, so it's much less sensitive to exactly which few positive examples ended up in the held-out set.
+
+## Step 10 results: hyperparameter tuning
+Run via `run_hyperparameter_tuning.py` (new), `GridSearchCV` scored on ROC-AUC, 3-fold CV within `X_train`, evaluated once on the held-out `X_test`.
+
+Note: `CREDIT_RISK_NEXT_STEPS.md`'s sample code (`GridSearchCV(EasyEnsembleClassifier(...), {'n_estimators': [...], 'max_depth': [...]}, ...)`) doesn't actually run -- `EasyEnsembleClassifier` has no top-level `max_depth` (it lives on the nested base estimator, reachable only via `estimator__estimator__max_depth`). Same "hallucinated/unreachable API" pattern as bug #7. Worked around it by tuning `n_estimators` only for Easy Ensemble.
+
+| Model | Grid searched | Best params | Best CV ROC-AUC | Held-out test ROC-AUC | Untuned baseline test ROC-AUC |
+|---|---|---|---|---|---|
+| Balanced Random Forest | n_estimators in {100,200}, max_depth in {10, None} | n_estimators=200, max_depth=None | 0.862 | 0.883 | 0.889 (n_estimators=128) |
+| Easy Ensemble | n_estimators in {50,100,150} | n_estimators=150 | 0.943 | 0.964 | 0.964 (n_estimators=100) |
+
+**Finding:** tuning didn't meaningfully beat the original, essentially arbitrary settings (128 trees for Balanced RF, 100 estimators for Easy Ensemble) -- Easy Ensemble's tuned test ROC-AUC (0.964) is identical to baseline within rounding, and Balanced RF's tuned result (0.883) is actually *slightly below* its untuned baseline (0.889), well within noise. Read this as "the original settings were already in a flat part of the performance curve for this grid," not "the tuning failed" -- a real, if unglamorous, result worth reporting rather than skipping because it's not a dramatic improvement.
 
 ## Environment/tooling gotchas (if continuing on this machine)
 - `imbalanced-learn` wasn't installed — now installed (`0.14.2`).

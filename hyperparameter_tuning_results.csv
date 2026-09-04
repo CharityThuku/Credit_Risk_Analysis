@@ -1,0 +1,3 @@
+method,max_depth,n_estimators,best_cv_roc_auc,test_roc_auc
+Balanced Random Forest,,200,0.8622599367326073,0.8833495829489157
+Easy Ensemble,,150,0.9426731558674413,0.9638150605734637
