@@ -21,7 +21,11 @@ User is new to ML metrics — walkthrough proceeds one concept/file at a time wi
 - Done — Step 6: `credit_risk_visualizations.py` / `COPY_PASTE_CODE.py` plotting functions — explained conceptually and generated real plots from corrected data
 - Done — Step 7: `credit_risk_threshold_optimization.py`: threshold tuning + cost-benefit analysis on Easy Ensemble's real `y_proba` from `model_results.pkl` (no retraining needed). Found and fixed two more mislabeled-metric bugs in the template (see below) before trusting the numbers.
 - Done — Step 8: `CODE_REVIEW_CHECKLIST.md` / `CREDIT_RISK_NEXT_STEPS.md` walkthrough, audited against the real notebooks. Found one more bug (hallucinated API param in the checklist itself, see below). See "Step 8" section below for the full audit and open questions for the user.
-- Next — user to pick which optional enhancements from `CREDIT_RISK_NEXT_STEPS.md` (if any) to actually implement; then update the stale `EXECUTIVE_SUMMARY.md`/`README_IMPROVEMENTS.md`.
+- User chose to pursue: cross-validation, hyperparameter tuning, SHAP explainability (skipped updating the stale docs for now).
+- Done — Step 9: 5-fold cross-validation on all 6 methods. See results below -- a real, non-trivial finding here.
+- In progress — Step 10: hyperparameter tuning (Balanced RF, Easy Ensemble)
+- Not yet started — Step 11: SHAP explainability
+- Still pending: updating `EXECUTIVE_SUMMARY.md`/`README_IMPROVEMENTS.md`.
 - Not yet done: updating `EXECUTIVE_SUMMARY.md` / `README_IMPROVEMENTS.md`, which still describe the old, buggy numbers — user explicitly deferred this to keep doing the technical walkthrough first
 
 ## Real bugs found in the original notebooks (all now fixed)
@@ -101,6 +105,24 @@ Went through both docs section by section against the real, fixed notebooks and 
 **Bug found in the checklist doc itself:** see bug #7 above (hallucinated `n_clusters` param on `ClusterCentroids`).
 
 **Open question left for the user:** which (if any) of the intermediate/advanced enhancements in `CREDIT_RISK_NEXT_STEPS.md` (cross-validation, hyperparameter tuning, calibration, SHAP) to actually implement, since these are optional scope additions rather than corrections to existing work.
+
+## Step 9 results: 5-fold cross-validation (all 6 methods)
+Run via `run_cross_validation.py` (new), CV done strictly on `X_train` (imblearn `Pipeline` resamples inside each fold only, no leakage), `X_test` never touched. Purpose: check whether the single train/test split's numbers were representative.
+
+| Method | Single-split Bal.Acc | CV Bal.Acc (mean +/- std) | Single-split ROC-AUC | CV ROC-AUC (mean +/- std) | Bal.Acc gap |
+|---|---|---|---|---|---|
+| Naive Random Oversampling | 0.679 | 0.677 +/- 0.045 | 0.725 | 0.731 +/- 0.036 | 0.1 sigma |
+| SMOTE Oversampling | 0.662 | 0.654 +/- 0.052 | 0.713 | 0.717 +/- 0.043 | 0.1 sigma |
+| Cluster Centroid Undersampling | 0.613 | 0.655 +/- 0.030 | 0.666 | 0.707 +/- 0.030 | -1.4 sigma |
+| SMOTEENN Sampling | 0.655 | 0.660 +/- 0.040 | 0.720 | 0.714 +/- 0.043 | -0.1 sigma |
+| Balanced Random Forest | 0.752 | 0.724 +/- 0.040 | 0.889 | 0.862 +/- 0.035 | 0.7 sigma |
+| **Easy Ensemble** | **0.906** | **0.858 +/- 0.009** | 0.963 | 0.950 +/- 0.015 | **5.1 sigma** |
+
+**Real finding, not just a validation formality:** every method's single-split balanced accuracy falls within ~1.4 standard deviations of its 5-fold CV mean -- *except* Easy Ensemble, which sits 5.1 standard deviations above its CV mean (0.906 vs. 0.858 +/- 0.009, a very tight CV distribution). That means the original 90.6% balanced-accuracy figure -- the one quoted as Easy Ensemble's headline number in `EXECUTIVE_SUMMARY.md` and the walkthrough so far -- looks like it came from a favorable test split for this specific metric, not a representative one. A more honest number is **~0.86**.
+
+**The core conclusion still holds, though:** Easy Ensemble's ROC-AUC (the threshold-independent metric the recommendation is actually based on) is far more stable -- single-split 0.963 vs. CV mean 0.950 +/- 0.015, well within noise -- and still clearly the best of all 6 methods (next best, Balanced RF, CV means 0.862 +/- 0.035). So "Easy Ensemble is the best model" is robust; "Easy Ensemble achieves 90.6% balanced accuracy" is not -- that number should be corrected to ~86% (with the CV std noted) wherever it's quoted going forward, including the still-stale `EXECUTIVE_SUMMARY.md`.
+
+**Why balanced accuracy is the noisy one here:** the test set only has 87 actual high-risk loans. Balanced accuracy's sensitivity term is estimated from that tiny sample, so it swings a lot between which 87 loans happen to land in the split. ROC-AUC integrates over all thresholds using all 17,205 predicted probabilities, so it's much less sensitive to exactly which few positive examples ended up in the held-out set.
 
 ## Environment/tooling gotchas (if continuing on this machine)
 - `imbalanced-learn` wasn't installed — now installed (`0.14.2`).

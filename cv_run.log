@@ -1,0 +1,46 @@
+CV runs on X_train only: (51612, 95)
+
+Running 5-fold CV: Naive Random Oversampling ...
+  balanced_accuracy: 0.677 +/- 0.045
+  roc_auc:           0.731 +/- 0.036
+  f1:                0.020 +/- 0.002
+  (45.9s)
+
+Running 5-fold CV: SMOTE Oversampling ...
+  balanced_accuracy: 0.654 +/- 0.052
+  roc_auc:           0.717 +/- 0.043
+  f1:                0.018 +/- 0.003
+  (37.7s)
+
+Running 5-fold CV: Cluster Centroid Undersampling ...
+  balanced_accuracy: 0.655 +/- 0.030
+  roc_auc:           0.707 +/- 0.030
+  f1:                0.017 +/- 0.001
+  (23.8s)
+
+Running 5-fold CV: SMOTEENN Sampling ...
+  balanced_accuracy: 0.660 +/- 0.040
+  roc_auc:           0.714 +/- 0.043
+  f1:                0.018 +/- 0.002
+  (152.3s)
+
+Running 5-fold CV: Balanced Random Forest ...
+  balanced_accuracy: 0.724 +/- 0.040
+  roc_auc:           0.862 +/- 0.035
+  f1:                0.234 +/- 0.064
+  (3.4s)
+
+Running 5-fold CV: Easy Ensemble ...
+  balanced_accuracy: 0.858 +/- 0.009
+  roc_auc:           0.950 +/- 0.015
+  f1:                0.108 +/- 0.012
+  (76.0s)
+
+Saved cross_validation_results.csv
+                        method  balanced_accuracy_mean  balanced_accuracy_std  roc_auc_mean  roc_auc_std  f1_mean   f1_std  seconds
+     Naive Random Oversampling                0.676774               0.044523      0.731452     0.035639 0.019525 0.002308     45.9
+            SMOTE Oversampling                0.654184               0.051946      0.717322     0.042627 0.018308 0.002668     37.7
+Cluster Centroid Undersampling                0.655296               0.029932      0.707124     0.030022 0.016682 0.001406     23.8
+             SMOTEENN Sampling                0.659725               0.040411      0.714419     0.042639 0.017715 0.001741    152.3
+        Balanced Random Forest                0.724090               0.039943      0.862207     0.035285 0.233768 0.063706      3.4
+                 Easy Ensemble                0.857737               0.009439      0.949541     0.014540 0.107600 0.011967     76.0
