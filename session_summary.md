@@ -24,8 +24,8 @@ User is new to ML metrics — walkthrough proceeds one concept/file at a time wi
 - User chose to pursue: cross-validation, hyperparameter tuning, SHAP explainability (skipped updating the stale docs for now).
 - Done — Step 9: 5-fold cross-validation on all 6 methods. See results below -- a real, non-trivial finding here.
 - Done — Step 10: hyperparameter tuning (Balanced RF, Easy Ensemble). See results below -- tuning barely moved the needle, which is itself a useful finding.
-- In progress — Step 11: SHAP explainability
-- Still pending: updating `EXECUTIVE_SUMMARY.md`/`README_IMPROVEMENTS.md`.
+- Done — Step 11: SHAP explainability. Found and fixed a real bug (dtype issue) along the way; results independently confirm the temporal-artifact concern from Step 6.
+- Still pending: updating `EXECUTIVE_SUMMARY.md`/`README_IMPROVEMENTS.md`/`README.md` (three stale docs now, see "GitHub repo" section).
 - Not yet done: updating `EXECUTIVE_SUMMARY.md` / `README_IMPROVEMENTS.md`, which still describe the old, buggy numbers — user explicitly deferred this to keep doing the technical walkthrough first
 
 ## Real bugs found in the original notebooks (all now fixed)
@@ -135,6 +135,22 @@ Note: `CREDIT_RISK_NEXT_STEPS.md`'s sample code (`GridSearchCV(EasyEnsembleClass
 | Easy Ensemble | n_estimators in {50,100,150} | n_estimators=150 | 0.943 | 0.964 | 0.964 (n_estimators=100) |
 
 **Finding:** tuning didn't meaningfully beat the original, essentially arbitrary settings (128 trees for Balanced RF, 100 estimators for Easy Ensemble) -- Easy Ensemble's tuned test ROC-AUC (0.964) is identical to baseline within rounding, and Balanced RF's tuned result (0.883) is actually *slightly below* its untuned baseline (0.889), well within noise. Read this as "the original settings were already in a flat part of the performance curve for this grid," not "the tuning failed" -- a real, if unglamorous, result worth reporting rather than skipping because it's not a dramatic improvement.
+
+## Step 11 results: SHAP explainability
+Run via `run_shap_explainability.py` (new).
+
+**Balanced Random Forest** (exact, `shap.TreeExplainer`, 1000-row test sample, ~15s):
+Top features by mean |SHAP|: `total_rec_prncp`, `issue_d_Jan-2019`, `last_pymnt_amnt`, `total_pymnt_inv`, `int_rate`, `total_pymnt`, `total_rec_int`, `issue_d_Mar-2019`, `mths_since_recent_inq`, `next_pymnt_d_Apr-2019`. Plot: `shap_balanced_rf_summary.png`.
+
+**Easy Ensemble** (approximate -- see bug note below, `shap.Explainer` model-agnostic PermutationExplainer, 30 explained rows / 50 background rows, ~10.5 minutes):
+Top features: `issue_d_Jan-2019`, `issue_d_Mar-2019`, `total_rec_prncp`, `total_rec_int`, `last_pymnt_amnt`, `int_rate`, `next_pymnt_d_May-2019`, `installment`, `next_pymnt_d_Apr-2019`, `total_pymnt`. Plot: `shap_easy_ensemble_summary_APPROX.png` (explicitly named APPROX -- n=30 is not a reliable sample size, treat as directional only).
+
+**This independently confirms the Step 6 temporal-artifact finding, via a completely different method:** both models' top-10 SHAP features include the loan issue month (`issue_d_Jan-2019`/`issue_d_Mar-2019`), and for Easy Ensemble these rank #1 and #2 -- even more prominent than in the built-in `feature_importances_` ranking. Two independent explainability methods agreeing on this makes it a stronger candidate for a genuine caveat (probably a real signal about when in the quarter a loan had time to default) rather than a fluke of one importance metric.
+
+8. **Bug found while running SHAP**: `pd.get_dummies()` in `data_loader.py` (and originally in the notebooks/`run_full_analysis.py`) produces a mix of `float64` and `bool` columns. Calling `.values` on a DataFrame with that dtype mix silently produces an `object`-dtype numpy array (not auto-promoted to float), which crashed `shap`'s tabular masker (`TypeError: ufunc 'isfinite' not supported`). Fixed by casting `X_train`/`X_test` to `float` before handing them to SHAP. This dtype quirk doesn't affect the sklearn/imblearn model training itself (those tolerate the mixed-dtype DataFrame fine), only SHAP's internal numpy operations -- worth knowing if any future numpy-based tooling touches this data.
+
+## Step 12: pushed to GitHub (github.com/CharityThuku/Credit_Risk_Analysis)
+This is the user's original 2021 bootcamp submission repo (buggy notebooks, old numbers, a `README.md` describing the pre-fix results -- Easy Ensemble at 82% accuracy, etc.). User chose to **merge histories** rather than overwrite: added it as `origin`, fetched, and merged with `--allow-unrelated-histories -X ours`, so the 2021 commits are preserved as ancestors and the corrected 2026 work (this whole session_summary's worth of steps) sits on top. Conflicting files (both notebooks, `.gitignore`, `LoanStats_2019Q1.csv`) resolved in favor of the corrected local versions; the original `README.md` was carried over unmodified (only the remote had it) and is now a third stale doc alongside `EXECUTIVE_SUMMARY.md`/`README_IMPROVEMENTS.md` describing the old buggy numbers -- update all three together when that task is picked up.
 
 ## Environment/tooling gotchas (if continuing on this machine)
 - `imbalanced-learn` wasn't installed — now installed (`0.14.2`).

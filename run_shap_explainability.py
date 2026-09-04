@@ -28,6 +28,11 @@ from imblearn.ensemble import BalancedRandomForestClassifier, EasyEnsembleClassi
 from data_loader import load_train_test
 
 X_train, X_test, y_train, y_test, feature_names = load_train_test()
+# pd.get_dummies leaves a mix of float64 and bool columns; DataFrame.values
+# on a mixed-dtype frame like that becomes an object array, which SHAP's
+# tabular masker can't run np.isfinite on. Cast to float up front.
+X_train = X_train.astype(float)
+X_test = X_test.astype(float)
 
 # ============================================================================
 # 1. Balanced Random Forest -- exact TreeExplainer

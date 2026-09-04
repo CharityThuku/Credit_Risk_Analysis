@@ -1,0 +1,36 @@
+Training Balanced Random Forest...
+Computing SHAP values (TreeExplainer, exact) on a 1000-row test sample...
+  done in 14.5s
+  Saved shap_balanced_rf_summary.png
+
+Top 10 features by mean |SHAP value| (Balanced Random Forest):
+  total_rec_prncp: 0.0354
+  issue_d_Jan-2019: 0.0331
+  last_pymnt_amnt: 0.0295
+  total_pymnt_inv: 0.0282
+  int_rate: 0.0282
+  total_pymnt: 0.0260
+  total_rec_int: 0.0244
+  issue_d_Mar-2019: 0.0190
+  mths_since_recent_inq: 0.0106
+  next_pymnt_d_Apr-2019: 0.0070
+
+Training Easy Ensemble...
+Computing approximate SHAP values (model-agnostic, small sample -- this is slow, kept deliberately tiny)...
+PermutationExplainer explainer:   3%|3         | 1/30 [00:00<?, ?it/s]PermutationExplainer explainer:  10%|#         | 3/30 [00:47<04:18,  9.58s/it]PermutationExplainer explainer:  13%|#3        | 4/30 [01:07<05:54, 13.64s/it]PermutationExplainer explainer:  17%|#6        | 5/30 [01:25<06:22, 15.31s/it]PermutationExplainer explainer:  20%|##        | 6/30 [01:45<06:49, 17.05s/it]PermutationExplainer explainer:  23%|##3       | 7/30 [02:06<07:05, 18.49s/it]PermutationExplainer explainer:  27%|##6       | 8/30 [02:28<07:08, 19.47s/it]PermutationExplainer explainer:  30%|###       | 9/30 [02:47<06:44, 19.26s/it]PermutationExplainer explainer:  33%|###3      | 10/30 [03:05<06:21, 19.07s/it]PermutationExplainer explainer:  37%|###6      | 11/30 [03:22<05:50, 18.43s/it]PermutationExplainer explainer:  40%|####      | 12/30 [03:39<05:24, 18.04s/it]PermutationExplainer explainer:  43%|####3     | 13/30 [03:57<05:04, 17.93s/it]PermutationExplainer explainer:  47%|####6     | 14/30 [04:13<04:37, 17.36s/it]PermutationExplainer explainer:  50%|#####     | 15/30 [04:31<04:20, 17.40s/it]PermutationExplainer explainer:  53%|#####3    | 16/30 [04:48<04:02, 17.33s/it]PermutationExplainer explainer:  57%|#####6    | 17/30 [05:05<03:44, 17.29s/it]PermutationExplainer explainer:  60%|######    | 18/30 [05:24<03:33, 17.83s/it]PermutationExplainer explainer:  63%|######3   | 19/30 [05:43<03:21, 18.28s/it]PermutationExplainer explainer:  67%|######6   | 20/30 [06:04<03:09, 18.99s/it]PermutationExplainer explainer:  70%|#######   | 21/30 [06:23<02:51, 19.09s/it]PermutationExplainer explainer:  73%|#######3  | 22/30 [06:43<02:33, 19.24s/it]PermutationExplainer explainer:  77%|#######6  | 23/30 [07:02<02:13, 19.11s/it]PermutationExplainer explainer:  80%|########  | 24/30 [07:22<01:56, 19.36s/it]PermutationExplainer explainer:  83%|########3 | 25/30 [07:40<01:35, 19.03s/it]PermutationExplainer explainer:  87%|########6 | 26/30 [07:57<01:13, 18.30s/it]PermutationExplainer explainer:  90%|######### | 27/30 [08:19<00:58, 19.55s/it]PermutationExplainer explainer:  93%|#########3| 28/30 [09:05<00:54, 27.45s/it]PermutationExplainer explainer:  97%|#########6| 29/30 [09:48<00:32, 32.25s/it]PermutationExplainer explainer: 100%|##########| 30/30 [10:08<00:00, 28.47s/it]PermutationExplainer explainer: 31it [10:26, 25.33s/it]                        PermutationExplainer explainer: 31it [10:26, 20.89s/it]
+  done in 626.6s (n=30 explained rows -- approximate, not for production use)
+  Saved shap_easy_ensemble_summary_APPROX.png (approximate -- small sample)
+
+Top 10 features by mean |SHAP value| (Easy Ensemble, approximate, n=30):
+  issue_d_Jan-2019: 0.0313
+  issue_d_Mar-2019: 0.0311
+  total_rec_prncp: 0.0266
+  total_rec_int: 0.0234
+  last_pymnt_amnt: 0.0232
+  int_rate: 0.0131
+  next_pymnt_d_May-2019: 0.0113
+  installment: 0.0110
+  next_pymnt_d_Apr-2019: 0.0110
+  total_pymnt: 0.0056
+
+Done.
