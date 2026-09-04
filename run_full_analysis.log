@@ -1,0 +1,73 @@
+Loading data...
+Train: (51612, 95), Test: (17205, 95)
+Test class balance:
+loan_status
+low_risk     17118
+high_risk       87
+Name: count, dtype: int64
+
+[1/6] Naive Random Oversampling...
+[2/6] SMOTE Oversampling...
+[3/6] Cluster Centroid Undersampling (slow)...
+[4/6] SMOTEENN Sampling (slow)...
+[5/6] Balanced Random Forest...
+[6/6] Easy Ensemble (slow)...
+
+Saved predictions to model_results.pkl
+
+====================================================================================================
+COMPREHENSIVE MODEL COMPARISON
+====================================================================================================
+                                Accuracy  Precision  Recall  Specificity  F1 Score  ROC-AUC
+Model                                                                                      
+Naive Random Oversampling         0.6795     0.0100  0.7241       0.6348    0.0197   0.7254
+SMOTE Oversampling                0.6619     0.0095  0.6897       0.6341    0.0187   0.7128
+Cluster Centroid Undersampling    0.6130     0.0076  0.6782       0.5478    0.0150   0.6657
+SMOTEENN Sampling                 0.6550     0.0088  0.7241       0.5859    0.0174   0.7202
+Balanced Random Forest            0.7517     0.1596  0.5172       0.9862    0.2439   0.8894
+Easy Ensemble                     0.9056     0.0665  0.8736       0.9377    0.1237   0.9635
+Saved comparison table to model_comparison.csv
+
+Generating confusion matrix grid...
+✓ Confusion matrices saved
+Generating ROC curve comparison...
+✓ ROC curves saved
+Generating feature importance comparison...
+Top 5 features (Balanced Random Forest):
+last_pymnt_amnt    0.072168
+total_rec_prncp    0.070315
+total_pymnt_inv    0.061383
+total_rec_int      0.058873
+total_pymnt        0.051275
+Top 5 features (Easy Ensemble):
+total_rec_int       0.269255
+total_rec_prncp     0.167102
+last_pymnt_amnt     0.132233
+issue_d_Mar-2019    0.089349
+issue_d_Jan-2019    0.069367
+Generating precision-recall trade-off plot...
+✓ Precision-Recall trade-off plot saved
+
+================================================================================
+EXECUTIVE SUMMARY
+================================================================================
+
+🏆 Best Overall Model (ROC-AUC): Easy Ensemble
+   Score: 0.9635
+
+🎯 Best at Catching Defaults (Recall): Easy Ensemble
+   Recall: 0.8736
+
+⚡ Best Balance (F1 Score): Balanced Random Forest
+   F1: 0.2439
+
+💡 RECOMMENDATION:
+   Use 'Easy Ensemble' for credit risk prediction
+   
+   Rationale:
+   - Highest ROC-AUC (0.9635): Best overall discrimination
+   - High Recall (0.8736): Catches most defaults
+   - Accuracy (0.9056): Reliable predictions
+
+   Next steps: Optimize decision threshold to maximize F1 or minimize cost
+================================================================================
