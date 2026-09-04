@@ -20,7 +20,8 @@ User is new to ML metrics — walkthrough proceeds one concept/file at a time wi
 - Done — Step 5: `credit_risk_metrics.py` code walkthrough (`evaluate_model()` line by line)
 - Done — Step 6: `credit_risk_visualizations.py` / `COPY_PASTE_CODE.py` plotting functions — explained conceptually and generated real plots from corrected data
 - Done — Step 7: `credit_risk_threshold_optimization.py`: threshold tuning + cost-benefit analysis on Easy Ensemble's real `y_proba` from `model_results.pkl` (no retraining needed). Found and fixed two more mislabeled-metric bugs in the template (see below) before trusting the numbers.
-- Next — `CODE_REVIEW_CHECKLIST.md` / `CREDIT_RISK_NEXT_STEPS.md` walkthrough
+- Done — Step 8: `CODE_REVIEW_CHECKLIST.md` / `CREDIT_RISK_NEXT_STEPS.md` walkthrough, audited against the real notebooks. Found one more bug (hallucinated API param in the checklist itself, see below). See "Step 8" section below for the full audit and open questions for the user.
+- Next — user to pick which optional enhancements from `CREDIT_RISK_NEXT_STEPS.md` (if any) to actually implement; then update the stale `EXECUTIVE_SUMMARY.md`/`README_IMPROVEMENTS.md`.
 - Not yet done: updating `EXECUTIVE_SUMMARY.md` / `README_IMPROVEMENTS.md`, which still describe the old, buggy numbers — user explicitly deferred this to keep doing the technical walkthrough first
 
 ## Real bugs found in the original notebooks (all now fixed)
@@ -32,6 +33,7 @@ User is new to ML metrics — walkthrough proceeds one concept/file at a time wi
 6. **`cost_benefit_analysis()` in `credit_risk_threshold_optimization.py` had two mislabeled business metrics** (found while running Step 7):
    - `accepted_rate` was computed as `(tp + fp) / total` — that's the rate of loans *flagged high-risk* (i.e. denied), the opposite of acceptance. Fixed to `(tn + fn) / total` (predicted-negative = approved population).
    - `default_rate_among_accepted` was computed as `fn / (tp + fn)` — that denominator is *all actual defaulters*, so the field was really just the false-negative rate (1 − recall), not a default rate among approved loans at all. At threshold 0.5 this printed **12.6%**, which would read to a business stakeholder as "1 in 8 approved loans defaults" — wildly misleading. Fixed to `fn / (tn + fn)`, the correct denominator (approved population); real value is **0.07%**.
+7. **`CODE_REVIEW_CHECKLIST.md`'s Cluster Centroid Undersampling code sample calls a parameter that doesn't exist**: `ClusterCentroids(random_state=1, n_clusters=<minority_class_count>)`. Checked imblearn's real signature — `ClusterCentroids(*, sampling_strategy='auto', random_state=None, estimator=None, voting='auto')` — there is no `n_clusters` param; running the checklist's sample as-written raises `TypeError`. The actual notebook code (`ClusterCentroids(random_state=1)`) is fine and relies on the correct default (`sampling_strategy='auto'` balances to the minority count automatically) — this is a doc bug, not a notebook bug, but it's the same "hallucinated/wrong API" pattern as the earlier mislabeled-algorithm bugs. Not fixed in the checklist doc yet (low priority, reference-only file).
 
 ## Real corrected results (from `run_full_analysis.py`, the authoritative run)
 | Method | Balanced Acc | Precision | Recall | ROC-AUC |
@@ -79,6 +81,26 @@ decision isn't "which threshold has the best F1" — it's "what are our actual d
 since the ranking of thresholds by total cost is sensitive to that ratio. Worth revisiting with real
 lending economics if this were used for an actual business writeup, rather than the placeholder $1k/$5k
 costs used here.
+
+## Step 8: CODE_REVIEW_CHECKLIST.md / CREDIT_RISK_NEXT_STEPS.md audit
+Went through both docs section by section against the real, fixed notebooks and scripts (not just taking the docs at face value, given the pattern of bugs found so far).
+
+**Already satisfied by real work done:**
+- Stratified train-test split with no leakage (Step 1-2 fixes)
+- All 4 resampling methods correctly applied to `X_train`/`y_train` only, correct algorithms (Step 1-2 fixes)
+- Balanced Random Forest + Easy Ensemble trained correctly, feature importance extracted (Step 4/6)
+- Balanced accuracy + `classification_report_imbalanced` (precision, recall, specificity, geometric mean) computed **inside both notebooks** for every method
+- ROC-AUC, F1, full 6-model comparison table, confusion matrix grid, feature importance chart — all done, but live in `run_full_analysis.py` / the 4 PNGs rather than inside the notebooks themselves
+- Threshold optimization + cost-benefit analysis — done in Step 7
+
+**Genuine gaps found (checked against actual code, not assumed):**
+- `pd.get_dummies(X)` in both notebooks doesn't use `drop_first=True` as the checklist recommends. This only matters for the Logistic Regression models (tree-based models are unaffected by the resulting multicollinearity) — minor, not a correctness bug, just a style/statistics nicety. Not changed.
+- ROC-AUC and F1 are computed in `run_full_analysis.py` but not inside the notebooks themselves — cosmetic gap only, the real numbers already exist and are correct.
+- Genuinely not done anywhere: cross-validation (Step 7 in `CREDIT_RISK_NEXT_STEPS.md`), hyperparameter tuning (Step 8), learning curves, calibration analysis, isolation forest, SHAP/LIME. These are the "intermediate/advanced" tier — real additional analysis, not just documentation cleanup, and would take meaningful compute time on this 93MB dataset (Easy Ensemble alone re-trains 100 AdaBoost ensembles).
+
+**Bug found in the checklist doc itself:** see bug #7 above (hallucinated `n_clusters` param on `ClusterCentroids`).
+
+**Open question left for the user:** which (if any) of the intermediate/advanced enhancements in `CREDIT_RISK_NEXT_STEPS.md` (cross-validation, hyperparameter tuning, calibration, SHAP) to actually implement, since these are optional scope additions rather than corrections to existing work.
 
 ## Environment/tooling gotchas (if continuing on this machine)
 - `imbalanced-learn` wasn't installed — now installed (`0.14.2`).
