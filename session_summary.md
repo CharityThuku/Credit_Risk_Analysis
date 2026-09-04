@@ -25,7 +25,8 @@ User is new to ML metrics — walkthrough proceeds one concept/file at a time wi
 - Done — Step 9: 5-fold cross-validation on all 6 methods. See results below -- a real, non-trivial finding here.
 - Done — Step 10: hyperparameter tuning (Balanced RF, Easy Ensemble). See results below -- tuning barely moved the needle, which is itself a useful finding.
 - Done — Step 11: SHAP explainability. Found and fixed a real bug (dtype issue) along the way; results independently confirm the temporal-artifact concern from Step 6.
-- Still pending: updating `EXECUTIVE_SUMMARY.md`/`README_IMPROVEMENTS.md`/`README.md` (three stale docs now, see "GitHub repo" section).
+- Done — `README.md` (the GitHub-facing doc) rewritten with corrected results, CV caveat, threshold optimization, SHAP findings, and a changelog. Pushed.
+- Still pending: `EXECUTIVE_SUMMARY.md`/`README_IMPROVEMENTS.md` (the two files from the original template package) still describe pre-fix numbers.
 - Not yet done: updating `EXECUTIVE_SUMMARY.md` / `README_IMPROVEMENTS.md`, which still describe the old, buggy numbers — user explicitly deferred this to keep doing the technical walkthrough first
 
 ## Real bugs found in the original notebooks (all now fixed)
